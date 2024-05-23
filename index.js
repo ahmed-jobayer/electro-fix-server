@@ -34,6 +34,8 @@ async function run() {
     await client.connect();
 
     const servicesCollection = client.db("ElectroFixDB").collection("services");
+    const bookedServicesCollection = client.db("ElectroFixDB").collection("bookedServices");
+    
 
     // get requests
 
@@ -57,6 +59,12 @@ async function run() {
       const result = await servicesCollection.insertOne(newService);
       res.send(result);
     });
+
+    app.post('/bookings', async (req, res) =>{
+      const newBooking = req.body;
+      const result = await bookedServicesCollection.insertOne(newBooking)
+      res.send(result)
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
