@@ -54,9 +54,13 @@ async function run() {
     });
 
     app.get("/bookedServices", async (req, res) => {
-      // const userId = req.query.userId
-      // console.log(userId)
-      const cursor = bookedServicesCollection.find();
+      const email = req.query.currentUserEmail
+      // console.log(email)
+      if (!email) {
+        res.status(400).send({error: 'email not found'})
+      }
+      const query = {currentUserEmail: email}
+      const cursor = bookedServicesCollection.find(query);
       const result = await cursor.toArray();
       res.send(result);
     });
