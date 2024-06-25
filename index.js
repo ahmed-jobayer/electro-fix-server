@@ -53,13 +53,29 @@ async function run() {
       res.send(cursor);
     });
 
-    app.get("/bookedServices", async (req, res) => {
-      const email = req.query.currentUserEmail
-      // console.log(email)
+    // user wise added services
+
+    app.get("/provider/services", async (req, res) => {
+      const email = req.query.currentUserEmail;
+      // console.log(email);
       if (!email) {
-        res.status(400).send({error: 'email not found'})
+        res.status(404).send({ error: "email not found" });
       }
-      const query = {currentUserEmail: email}
+      const query = { providerEmail: email };
+      const cursor = servicesCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // user wise booked services
+
+    app.get("/bookedServices", async (req, res) => {
+      const email = req.query.currentUserEmail;
+      // console.log(email);
+      if (!email) {
+        res.status(400).send({ error: "email not found" });
+      }
+      const query = { currentUserEmail: email };
       const cursor = bookedServicesCollection.find(query);
       const result = await cursor.toArray();
       res.send(result);
@@ -83,11 +99,11 @@ async function run() {
 
     // delete operatins
 
-    app.delete("/bookedServices/:id", async (req, res) => {
+    app.delete("/provider/services/:id", async (req, res) => {
       const id = req.params.id;
       console.log(id);
       const query = { _id: new ObjectId(id) };
-      const result = await bookedServicesCollection.deleteOne(query);
+      const result = await servicesCollection.deleteOne(query);
       res.send(result);
     });
 
@@ -102,3 +118,7 @@ async function run() {
   }
 }
 run().catch(console.dir);
+
+
+
+
