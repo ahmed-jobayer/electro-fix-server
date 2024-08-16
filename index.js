@@ -44,6 +44,7 @@ async function run() {
       const cursor = servicesCollection.find();
       const result = await cursor.toArray();
       res.send(result);
+      // console.log('request received')
     });
 
     app.get("/services/:id", async (req, res) => {
@@ -97,11 +98,22 @@ async function run() {
 
     // update operations
 
+    app.patch('/provider/service/:id', async (req, res) => {
+      const id = req.params.id;
+      const updateService = req.body;
+      // console.log(id, updateService)
+      const filter = {_id: new ObjectId(id)}
+      const updateDoc = {
+        $set: updateService
+      }
+      const result = await servicesCollection.updateOne(filter, updateDoc)
+      res.send(result)
+    })
     // delete operatins
 
     app.delete("/provider/services/:id", async (req, res) => {
       const id = req.params.id;
-      console.log(id);
+      // console.log(id);
       const query = { _id: new ObjectId(id) };
       const result = await servicesCollection.deleteOne(query);
       res.send(result);
