@@ -68,6 +68,20 @@ async function run() {
       res.send(result);
     });
 
+    // provider email wise booked services
+
+    app.get("/providerEmail/services", async (req, res) => {
+      const email = req.query.currentUserEmail;
+      // console.log(email);
+      if (!email) {
+        res.status(404).send({ error: "email not found" });
+      }
+      const query = { providerEmail: email };
+      const cursor = bookedServicesCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
     // user wise booked services
 
     app.get("/bookedServices", async (req, res) => {
@@ -109,6 +123,32 @@ async function run() {
       const result = await servicesCollection.updateOne(filter, updateDoc)
       res.send(result)
     })
+
+    // booked services status update
+
+    app.patch('/updateBookedService/:id', async (req, res) => {
+      const id = req.params.id
+      const status = req.body.status
+
+      if (!status) {
+        res.status(400).send({error: 'Status is required'})
+      }
+
+      try{
+        const filter = { _id: new ObjectId(id)};
+        const updateDoc = {
+          $set: {status}
+        }
+
+        const result = await bookedServicesCollection.updateOne(filter, updateDoc)
+        res.send(result)
+      }
+      catch(err) {
+        console.error('Error updating booked service status', err);
+        res.status(500).send({error: 'Failed to update service status'})
+      }
+    })
+
     // delete operatins
 
     app.delete("/provider/services/:id", async (req, res) => {
@@ -130,7 +170,6 @@ async function run() {
   }
 }
 run().catch(console.dir);
-
 
 
 
